@@ -7,6 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa'
  * path with its query, so a page root may be followed by `?` as well as `/`.
  */
 export const NOT_EDITOR_PAGES = [
+  /^\/download(?:[/?]|$)/,
   /^\/oauth\//,
   /^\/api\//,
   /^\/\.well-known\//,
