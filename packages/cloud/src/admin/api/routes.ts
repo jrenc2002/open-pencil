@@ -1,3 +1,4 @@
+import { TeamFontError, type TeamFontService } from '#cloud/server/fonts'
 import { requireTrustedMutationOrigin } from '#cloud/admin/api/security'
 import type { AdminAuditService } from '#cloud/admin/audit/service'
 import type { AdminDocumentService } from '#cloud/admin/documents/service'
@@ -76,6 +77,8 @@ export type CloudAdminServices = {
   operations: AdminOperationsService
   documents: AdminDocumentService
   reports: AdminReportService
+  /** 词元开物: the team font library. */
+  fonts: TeamFontService
 }
 
 export function createCloudAdminRoutes(
@@ -120,6 +123,10 @@ export function createCloudAdminRoutes(
     .onError((error, context) => {
       if (error instanceof AdminDomainError) {
         return context.json({ error: { code: error.code } }, adminErrorStatus(error))
+      }
+      if (error instanceof TeamFontError) {
+        const status = error.code === 'not_found' ? 404 : error.code === 'duplicate' ? 409 : 400
+        return context.json({ error: { code: error.code, message: error.message } }, status)
       }
       if (error instanceof v.ValiError) {
         return context.json({ error: { code: 'invalid_request' as const } }, 400)
@@ -246,6 +253,27 @@ export function createCloudAdminRoutes(
       context.json(await services.audit.list(context.req.valid('query')))
     )
     .get('/operations', async (context) => context.json(await services.operations.summary()))
+    .get('/fonts', async (context) => context.json({ fonts: await services.fonts.list() }))
+    .post('/fonts', async (context) => {
+      const form = await context.req.parseBody()
+      const file = form.file
+      if (!(file instanceof File)) {
+        return context.json({ error: { code: 'invalid_request' as const } }, 400)
+      }
+      const text = (value: unknown) => (typeof value === 'string' ? value : undefined)
+      const font = await services.fonts.add({
+        fileName: file.name,
+        bytes: new Uint8Array(await file.arrayBuffer()),
+        family: text(form.family),
+        style: text(form.style),
+        uploadedBy: context.get('actor').userId
+      })
+      return context.json({ font })
+    })
+    .delete('/fonts/:id', idParams, async (context) => {
+      await services.fonts.remove(context.req.valid('param').id)
+      return context.json({ ok: true as const })
+    })
     .get('/reports', validatedQuery(parseReportQuery), async (context) =>
       context.json(await services.reports.list(context.req.valid('query')))
     )

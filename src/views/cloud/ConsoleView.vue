@@ -11,6 +11,7 @@ import AccessTokensSection from '@/components/cloud-portal/sections/AccessTokens
 import AdminActivitySection from '@/components/cloud-portal/sections/AdminActivitySection.vue'
 import AdminDocumentsSection from '@/components/cloud-portal/sections/AdminDocumentsSection.vue'
 import AdminEmailSection from '@/components/cloud-portal/sections/AdminEmailSection.vue'
+import AdminFontsSection from '@/components/cloud-portal/sections/AdminFontsSection.vue'
 import AdminOverviewSection from '@/components/cloud-portal/sections/AdminOverviewSection.vue'
 import AdminPeopleSection from '@/components/cloud-portal/sections/AdminPeopleSection.vue'
 import AdminPersonSection from '@/components/cloud-portal/sections/AdminPersonSection.vue'
@@ -31,6 +32,7 @@ const ADMIN_SECTIONS = [
   'reports',
   'documents',
   'people',
+  'fonts',
   'email',
   'activity'
 ] as const
@@ -141,6 +143,12 @@ const sections = computed<PortalSection[]>(() => {
       group: value.sectionServer
     },
     {
+      id: 'fonts',
+      icon: PORTAL_SECTION_ICONS.fonts,
+      label: '字体库',
+      group: value.sectionServer
+    },
+    {
       id: 'email',
       icon: PORTAL_SECTION_ICONS.email,
       label: value.emailDelivery,
@@ -172,6 +180,7 @@ const description = computed(() => {
     reports: value.reportsDescription,
     documents: value.documentsDescription,
     people: peopleTotal.value === null ? null : value.peopleDescription(peopleTotal.value),
+    fonts: '团队共享字体：上传一次，所有成员的网页版和桌面端都能直接使用。',
     email: value.emailDeliveryDescription,
     activity: value.activityDescription
   }
@@ -244,6 +253,7 @@ onMounted(() => void refreshWaiting())
         @total="(count) => (peopleTotal = count)"
         @open="openPerson"
       />
+      <AdminFontsSection v-else-if="active === 'fonts'" />
       <AdminEmailSection v-else-if="active === 'email'" />
       <AdminActivitySection v-else />
     </KeepAlive>

@@ -1,3 +1,4 @@
+import type { TeamFontService } from '#cloud/server/fonts'
 import type { CloudAPIEnvironment } from '#cloud/server/api/types'
 import type { CloudSessionResolver } from '#cloud/server/auth'
 import { createBillingRoutes, type BillingTokenService } from '#cloud/server/billing'
@@ -48,6 +49,8 @@ export type CloudAPIServices = {
   billingTokens?: BillingTokenService
   workspaces: WorkspaceService
   workspaceMembers: WorkspaceMemberService
+  /** 词元开物: the team font library. */
+  fonts?: TeamFontService
 }
 
 export function createPublicCloudAPIRouter(services: CloudAPIServices) {
@@ -83,6 +86,18 @@ export function createCloudAPIRouter(services: CloudAPIServices) {
       })
     })
     .get('/session', (context) => context.json({ user: context.get('actor') }))
+    .get('/fonts', async (context) => {
+      if (!services.fonts) return context.json({ fonts: [] })
+      return context.json({ fonts: await services.fonts.list() })
+    })
+    .get('/fonts/:fontId/file', async (context) => {
+      const font = services.fonts ? await services.fonts.read(context.req.param('fontId')) : null
+      if (!font) return context.json({ error: { code: 'not_found' as const } }, 404)
+      return context.body(new Uint8Array(font.bytes), 200, {
+        'Content-Type': font.contentType,
+        'Cache-Control': 'private, max-age=86400'
+      })
+    })
     .route(
       '/',
       createServicesRoutes(

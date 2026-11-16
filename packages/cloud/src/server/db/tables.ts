@@ -424,6 +424,20 @@ export interface InvitationSendTable {
   sentAt: TimestampColumn
 }
 
+/** 词元开物: a face in the team font library. */
+export interface TeamFontTable {
+  id: string
+  family: string
+  style: string
+  weight: number
+  italic: boolean
+  objectKey: string
+  byteLength: number
+  contentType: string
+  uploadedBy: string | null
+  createdAt: TimestampColumn
+}
+
 export interface CloudDatabase {
   account: Account
   session: Session
@@ -462,6 +476,7 @@ export interface CloudDatabase {
   upload: UploadTable
   invitationSend: InvitationSendTable
   documentReport: DocumentReportTable
+  teamFont: TeamFontTable
 }
 
 export type NewTransactionalEmail = Insertable<TransactionalEmailTable>

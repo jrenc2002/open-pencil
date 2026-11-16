@@ -8,6 +8,7 @@ import IconKeyRound from '~icons/lucide/key-round'
 import IconMail from '~icons/lucide/mail'
 import IconMonitorSmartphone from '~icons/lucide/monitor-smartphone'
 import IconShieldCheck from '~icons/lucide/shield-check'
+import IconType from '~icons/lucide/type'
 import IconUserPlus from '~icons/lucide/user-plus'
 import IconUserRound from '~icons/lucide/user-round'
 import IconUsers from '~icons/lucide/users'
@@ -24,6 +25,7 @@ export const PORTAL_SECTION_ICONS = {
   reports: IconFlag,
   documents: IconFileText,
   people: IconUsers,
+  fonts: IconType,
   email: IconMail,
   activity: IconHistory
 } satisfies Record<string, Component>

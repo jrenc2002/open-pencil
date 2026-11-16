@@ -1,4 +1,6 @@
 import {
+  teamFontListSchema,
+  teamFontResponseSchema,
   adminAuditResponseSchema,
   adminCreateMembersResponseSchema,
   adminEmailResponseSchema,
@@ -92,6 +94,23 @@ export function createAdministrationAPI(call: CloudCall, { admin, api }: PortalR
     ) {
       return call(
         (options) => admin.users[action].$post({ json: { userId, reason } }, options),
+        adminMutationResponseSchema,
+        signal
+      )
+    },
+    /** 词元开物: the team font library. */
+    fonts(signal?: AbortSignal) {
+      return call((options) => admin.fonts.$get(undefined, options), teamFontListSchema, signal)
+    },
+    uploadFont(file: File, names: { family?: string; style?: string } = {}, signal?: AbortSignal) {
+      const form: { file: File; family?: string; style?: string } = { file }
+      if (names.family) form.family = names.family
+      if (names.style) form.style = names.style
+      return call((options) => admin.fonts.$post({ form }, options), teamFontResponseSchema, signal)
+    },
+    deleteFont(id: string, signal?: AbortSignal) {
+      return call(
+        (options) => admin.fonts[':id'].$delete({ param: { id } }, options),
         adminMutationResponseSchema,
         signal
       )

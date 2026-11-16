@@ -1,3 +1,4 @@
+import { createTeamFontService } from '#cloud/server/fonts'
 import {
   createAdminAuditService,
   createAdminDocumentService,
@@ -31,8 +32,10 @@ export function createAppRouters(
 ) {
   const { config, database } = services
   const { resolveIdentity, resolveSession } = resolvers
+  const fonts = createTeamFontService(database, services.objects)
   const admin = createCloudAdminRoutes(
     {
+      fonts,
       email: createAdminEmailService(database, services.transactionalEmail, {
         publicURL: config.publicURL
       }),
@@ -103,7 +106,8 @@ export function createAppRouters(
     database,
     rateLimitSecret: config.authSecret,
     servicesTokens: app.servicesTokens,
-    billingTokens: app.billingTokens
+    billingTokens: app.billingTokens,
+    fonts
   })
   const publicCloudAPI = createPublicCloudAPIRouter(shared)
   // Services such as billing authenticate with their own token, not a session.

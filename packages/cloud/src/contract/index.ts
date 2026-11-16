@@ -82,6 +82,7 @@ export {
   type CreditPack
 } from './billing'
 export * from './admin'
+export * from './fonts'
 export {
   cloudPresenceSchema,
   collaborationPrincipalSchema,

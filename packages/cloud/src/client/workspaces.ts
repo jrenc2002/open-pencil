@@ -1,4 +1,6 @@
 import {
+  teamFontListSchema,
+  type TeamFont,
   createdWorkspaceInvitationSchema,
   workspaceEntitlementsSchema,
   workspaceListSchema,
@@ -119,6 +121,16 @@ export function createWorkspaceRequests(
         }),
         onDiagnostic
       )
+    },
+    /** 词元开物: the faces in the team font library. */
+    async listTeamFonts(): Promise<TeamFont[]> {
+      const response = await parseResponse(client.fonts.$get(), teamFontListSchema, onDiagnostic)
+      return response.fonts
+    },
+    /** A team face's bytes, or null when the server has no such face. */
+    async teamFontFile(fontId: string): Promise<ArrayBuffer | null> {
+      const response = await client.fonts[':fontId'].file.$get({ param: { fontId } })
+      return response.ok ? response.arrayBuffer() : null
     },
     async getWorkspaceEntitlements(workspaceId: string): Promise<WorkspaceEntitlements> {
       const response = await parseResponse(
