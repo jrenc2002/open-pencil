@@ -435,6 +435,8 @@ export interface TeamFontTable {
   byteLength: number
   contentType: string
   uploadedBy: string | null
+  license: ColumnType<string, string | undefined, string>
+  licenseNote: string | null
   createdAt: TimestampColumn
 }
 

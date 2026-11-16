@@ -1,6 +1,9 @@
 import {
+  teamFontDownloadSchema,
   teamFontListSchema,
+  teamFontResponseSchema,
   type TeamFont,
+  type TeamFontLicense,
   createdWorkspaceInvitationSchema,
   workspaceEntitlementsSchema,
   workspaceListSchema,
@@ -127,10 +130,33 @@ export function createWorkspaceRequests(
       const response = await parseResponse(client.fonts.$get(), teamFontListSchema, onDiagnostic)
       return response.fonts
     },
-    /** A team face's bytes, or null when the server has no such face. */
-    async teamFontFile(id: string): Promise<ArrayBuffer | null> {
-      const response = await client.fonts[':id'].file.$get({ param: { id } })
-      return response.ok ? response.arrayBuffer() : null
+    /** Where to fetch a face's bytes from object storage; null when there is no such face. */
+    async teamFontDownloadURL(id: string): Promise<string | null> {
+      const response = await client.fonts[':id'].download.$get({ param: { id } })
+      if (!response.ok) return null
+      return v.parse(teamFontDownloadSchema, await response.json()).url
+    },
+    /** Adds a font file to the company font space. */
+    async uploadTeamFont(file: File, license?: TeamFontLicense): Promise<TeamFont> {
+      const form: { file: File; license?: TeamFontLicense } = { file }
+      if (license) form.license = license
+      const response = await parseResponse(
+        client.fonts.$post({ form }),
+        teamFontResponseSchema,
+        onDiagnostic
+      )
+      return response.font
+    },
+    async setTeamFontLicense(id: string, license: TeamFontLicense): Promise<TeamFont> {
+      const response = await parseResponse(
+        client.fonts[':id'].$patch({ param: { id }, json: { license } }),
+        teamFontResponseSchema,
+        onDiagnostic
+      )
+      return response.font
+    },
+    async deleteTeamFont(id: string): Promise<void> {
+      await responseBody(await client.fonts[':id'].$delete({ param: { id } }), onDiagnostic)
     },
     async getWorkspaceEntitlements(workspaceId: string): Promise<WorkspaceEntitlements> {
       const response = await parseResponse(

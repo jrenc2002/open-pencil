@@ -25,7 +25,6 @@ import {
 import type { CloudAPIEnvironment } from '#cloud/server/api'
 import type { CloudAuthAdapter } from '#cloud/server/auth'
 import type { CloudDatabase } from '#cloud/server/db'
-import { TeamFontError, type TeamFontService } from '#cloud/server/fonts'
 import { CLOUD_RATE_LIMITS, createActorRateLimiter } from '#cloud/server/rate-limit'
 import { idParams, validatedJSON, validatedQuery } from '#cloud/server/validation'
 import { Hono, type Context } from 'hono'
@@ -77,16 +76,7 @@ export type CloudAdminServices = {
   operations: AdminOperationsService
   documents: AdminDocumentService
   reports: AdminReportService
-  /** 词元开物: the team font library. */
-  fonts: TeamFontService
 }
-
-const TEAM_FONT_ERROR_STATUS = {
-  not_found: 404,
-  duplicate: 409,
-  too_large: 400,
-  unsupported_format: 400
-} as const
 
 export function createCloudAdminRoutes(
   services: CloudAdminServices,
@@ -130,10 +120,6 @@ export function createCloudAdminRoutes(
     .onError((error, context) => {
       if (error instanceof AdminDomainError) {
         return context.json({ error: { code: error.code } }, adminErrorStatus(error))
-      }
-      if (error instanceof TeamFontError) {
-        const status = TEAM_FONT_ERROR_STATUS[error.code]
-        return context.json({ error: { code: error.code, message: error.message } }, status)
       }
       if (error instanceof v.ValiError) {
         return context.json({ error: { code: 'invalid_request' as const } }, 400)
@@ -260,27 +246,6 @@ export function createCloudAdminRoutes(
       context.json(await services.audit.list(context.req.valid('query')))
     )
     .get('/operations', async (context) => context.json(await services.operations.summary()))
-    .get('/fonts', async (context) => context.json({ fonts: await services.fonts.list() }))
-    .post('/fonts', async (context) => {
-      const form = await context.req.parseBody()
-      const file = form.file
-      if (!(file instanceof File)) {
-        return context.json({ error: { code: 'invalid_request' as const } }, 400)
-      }
-      const text = (value: unknown) => (typeof value === 'string' ? value : undefined)
-      const font = await services.fonts.add({
-        fileName: file.name,
-        bytes: new Uint8Array(await file.arrayBuffer()),
-        family: text(form.family),
-        style: text(form.style),
-        uploadedBy: context.get('actor').userId
-      })
-      return context.json({ font })
-    })
-    .delete('/fonts/:id', idParams, async (context) => {
-      await services.fonts.remove(context.req.valid('param').id)
-      return context.json({ ok: true as const })
-    })
     .get('/reports', validatedQuery(parseReportQuery), async (context) =>
       context.json(await services.reports.list(context.req.valid('query')))
     )

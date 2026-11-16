@@ -119,7 +119,13 @@ export function createCloudPortalRouter(context: PortalContext) {
         meta: { account: true }
       },
       {
-        path: '/admin/:section(overview|requests|reports|documents|people|fonts|email|activity)?',
+        path: '/account/fonts',
+        name: 'fonts',
+        component: () => import('@/views/cloud/ConsoleView.vue'),
+        meta: { account: true }
+      },
+      {
+        path: '/admin/:section(overview|requests|reports|documents|people|email|activity)?',
         name: 'admin',
         component: () => import('@/views/cloud/ConsoleView.vue'),
         meta: { account: true, admin: true }

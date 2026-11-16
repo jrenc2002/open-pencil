@@ -1,3 +1,4 @@
+import { teamFontLicenseSchema, teamFontLicenseUpdateSchema } from '#cloud/contract'
 import type { CloudAPIEnvironment } from '#cloud/server/api/types'
 import type { CloudSessionResolver } from '#cloud/server/auth'
 import { createBillingRoutes, type BillingTokenService } from '#cloud/server/billing'
@@ -14,7 +15,7 @@ import {
   createDocumentVersionRoutes,
   type DocumentVersionService
 } from '#cloud/server/documents/versions'
-import type { TeamFontService } from '#cloud/server/fonts'
+import { TeamFontError, type TeamFontService } from '#cloud/server/fonts'
 import type { EntitlementService } from '#cloud/server/policy'
 import { createPublicReportRoutes, type DocumentReportService } from '#cloud/server/reports'
 import { createServicesRoutes, type ServicesTokenService } from '#cloud/server/services'
@@ -24,12 +25,12 @@ import {
   createPublicDocumentRoutes,
   createPublicSharingRoutes
 } from '#cloud/server/sharing'
-import { workspaceParams, idParams } from '#cloud/server/validation'
+import { workspaceParams, idParams, validatedJSON } from '#cloud/server/validation'
 import type { WorkspaceMemberService, WorkspaceService } from '#cloud/server/workspaces'
 import { createWorkspaceRoutes } from '#cloud/server/workspaces'
-import { Hono } from 'hono'
+import { Hono, type Context } from 'hono'
 import type { Kysely } from 'kysely'
-
+import * as v from 'valibot'
 export type CloudAPIServices = {
   database?: Kysely<CloudDatabase>
   rateLimitSecret?: string
@@ -65,6 +66,32 @@ export function createPublicCloudAPIRouter(services: CloudAPIServices) {
     .route('/', createCommunityRoutes(services.community))
 }
 
+const TEAM_FONT_ERROR_STATUS = {
+  not_found: 404,
+  forbidden: 403,
+  duplicate: 409,
+  too_large: 413,
+  unsupported_format: 415
+} as const
+
+const parseTeamFontLicenseUpdate = (input: unknown) => v.parse(teamFontLicenseUpdateSchema, input)
+
+/** A font-space answer, or the error a font operation raised, with its status. */
+async function fontResult<T extends object>(
+  context: Context<CloudAPIEnvironment>,
+  run: () => Promise<T>
+) {
+  try {
+    return context.json(await run())
+  } catch (error) {
+    if (!(error instanceof TeamFontError)) throw error
+    return context.json(
+      { error: { code: error.code, message: error.message } },
+      TEAM_FONT_ERROR_STATUS[error.code]
+    )
+  }
+}
+
 export function createCloudAPIRouter(services: CloudAPIServices) {
   return new Hono<CloudAPIEnvironment>()
     .route('/public', createPublicCloudAPIRouter(services))
@@ -90,12 +117,58 @@ export function createCloudAPIRouter(services: CloudAPIServices) {
       if (!services.fonts) return context.json({ fonts: [] })
       return context.json({ fonts: await services.fonts.list() })
     })
+    .get('/fonts/:id/download', idParams, async (context) => {
+      const url = services.fonts
+        ? await services.fonts.downloadURL(context.req.valid('param').id)
+        : null
+      if (!url) return context.json({ error: { code: 'not_found' as const } }, 404)
+      return context.json({ url })
+    })
     .get('/fonts/:id/file', idParams, async (context) => {
       const font = services.fonts ? await services.fonts.read(context.req.valid('param').id) : null
       if (!font) return context.json({ error: { code: 'not_found' as const } }, 404)
       return context.body(new Uint8Array(font.bytes), 200, {
         'Content-Type': font.contentType,
         'Cache-Control': 'private, max-age=86400'
+      })
+    })
+    .post('/fonts', async (context) => {
+      const fonts = services.fonts
+      if (!fonts) return context.json({ error: { code: 'not_found' as const } }, 404)
+      const form = await context.req.parseBody()
+      const file = form.file
+      if (!(file instanceof File)) {
+        return context.json({ error: { code: 'invalid_request' as const } }, 400)
+      }
+      const text = (value: unknown) => (typeof value === 'string' ? value : undefined)
+      const license = v.safeParse(teamFontLicenseSchema, form.license)
+      return fontResult(context, async () => ({
+        font: await fonts.add({
+          fileName: file.name,
+          bytes: new Uint8Array(await file.arrayBuffer()),
+          family: text(form.family),
+          style: text(form.style),
+          license: license.success ? license.output : undefined,
+          uploadedBy: context.get('actor').userId
+        })
+      }))
+    })
+    .patch('/fonts/:id', idParams, validatedJSON(parseTeamFontLicenseUpdate), async (context) => {
+      const fonts = services.fonts
+      if (!fonts) return context.json({ error: { code: 'not_found' as const } }, 404)
+      const { id } = context.req.valid('param')
+      const { license } = context.req.valid('json')
+      return fontResult(context, async () => ({
+        font: await fonts.setLicense(id, license, context.get('actor'))
+      }))
+    })
+    .delete('/fonts/:id', idParams, async (context) => {
+      const fonts = services.fonts
+      if (!fonts) return context.json({ error: { code: 'not_found' as const } }, 404)
+      const { id } = context.req.valid('param')
+      return fontResult(context, async () => {
+        await fonts.remove(id, context.get('actor'))
+        return { ok: true as const }
       })
     })
     .route(

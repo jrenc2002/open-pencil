@@ -35,7 +35,6 @@ export function createAppRouters(
   const fonts = createTeamFontService(database, services.objects)
   const admin = createCloudAdminRoutes(
     {
-      fonts,
       email: createAdminEmailService(database, services.transactionalEmail, {
         publicURL: config.publicURL
       }),

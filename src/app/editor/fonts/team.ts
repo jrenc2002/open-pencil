@@ -82,7 +82,12 @@ export function loadTeamFont(family: string, style: string): Promise<ArrayBuffer
   let file = files.get(font.id)
   if (!file) {
     file = cloudAPIClient(current.server, current.discovery)
-      .teamFontFile(font.id)
+      .teamFontDownloadURL(font.id)
+      .then(async (url) => {
+        if (!url) return null
+        const response = await fetch(url)
+        return response.ok ? response.arrayBuffer() : null
+      })
       .catch((error: unknown) => {
         console.warn(`[Fonts] Could not load team font ${family} ${style}`, error)
         files.delete(font.id)

@@ -16,6 +16,7 @@ import * as emailLocales from './migrations/012_email_locales'
 import * as documentBlockEmails from './migrations/013_document_block_emails'
 import * as reportReplies from './migrations/014_report_replies'
 import * as teamFonts from './migrations/015_team_fonts'
+import * as teamFontLicenses from './migrations/016_team_font_licenses'
 import type { CloudDatabase } from './tables'
 
 /**
@@ -41,7 +42,8 @@ const migrations: Record<string, CloudMigration> = {
   '012_email_locales': emailLocales,
   '013_document_block_emails': documentBlockEmails,
   '014_report_replies': reportReplies,
-  '015_team_fonts': teamFonts
+  '015_team_fonts': teamFonts,
+  '016_team_font_licenses': teamFontLicenses
 }
 
 /** Cloud's migrations, in order. */

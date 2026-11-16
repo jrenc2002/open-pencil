@@ -11,19 +11,19 @@ import AccessTokensSection from '@/components/cloud-portal/sections/AccessTokens
 import AdminActivitySection from '@/components/cloud-portal/sections/AdminActivitySection.vue'
 import AdminDocumentsSection from '@/components/cloud-portal/sections/AdminDocumentsSection.vue'
 import AdminEmailSection from '@/components/cloud-portal/sections/AdminEmailSection.vue'
-import AdminFontsSection from '@/components/cloud-portal/sections/AdminFontsSection.vue'
 import AdminOverviewSection from '@/components/cloud-portal/sections/AdminOverviewSection.vue'
 import AdminPeopleSection from '@/components/cloud-portal/sections/AdminPeopleSection.vue'
 import AdminPersonSection from '@/components/cloud-portal/sections/AdminPersonSection.vue'
 import AdminReportsSection from '@/components/cloud-portal/sections/AdminReportsSection.vue'
 import AdminRequestsSection from '@/components/cloud-portal/sections/AdminRequestsSection.vue'
+import FontSpaceSection from '@/components/cloud-portal/sections/FontSpaceSection.vue'
 import PlanSection from '@/components/cloud-portal/sections/PlanSection.vue'
 import ProfileSection from '@/components/cloud-portal/sections/ProfileSection.vue'
 import SecuritySection from '@/components/cloud-portal/sections/SecuritySection.vue'
 import SessionsSection from '@/components/cloud-portal/sections/SessionsSection.vue'
 import type { PortalSection } from '@/components/cloud-portal/types'
 
-const ACCOUNT_SECTIONS = ['profile', 'plan', 'security', 'sessions', 'tokens'] as const
+const ACCOUNT_SECTIONS = ['profile', 'fonts', 'plan', 'security', 'sessions', 'tokens'] as const
 /** Every section, and a few people's pages, stay loaded while others are shown. */
 const SECTIONS_KEPT = 12
 const ADMIN_SECTIONS = [
@@ -32,7 +32,6 @@ const ADMIN_SECTIONS = [
   'reports',
   'documents',
   'people',
-  'fonts',
   'email',
   'activity'
 ] as const
@@ -75,6 +74,12 @@ const sections = computed<PortalSection[]>(() => {
       id: 'profile',
       icon: PORTAL_SECTION_ICONS.profile,
       label: value.profile,
+      group: value.sectionAccount
+    },
+    {
+      id: 'fonts',
+      icon: PORTAL_SECTION_ICONS.fonts,
+      label: '字体空间',
       group: value.sectionAccount
     },
     // Only a server that sells plans has one to show.
@@ -143,12 +148,6 @@ const sections = computed<PortalSection[]>(() => {
       group: value.sectionServer
     },
     {
-      id: 'fonts',
-      icon: PORTAL_SECTION_ICONS.fonts,
-      label: '字体库',
-      group: value.sectionServer
-    },
-    {
       id: 'email',
       icon: PORTAL_SECTION_ICONS.email,
       label: value.emailDelivery,
@@ -171,6 +170,7 @@ const description = computed(() => {
   const value = messages.value
   const descriptions: Record<SectionId, string | null> = {
     profile: value.profileDescription({ host: portal.host }),
+    fonts: '词元开物的共享字体：每个人都可以上传，所有成员的网页版和桌面端都能直接使用。',
     plan: value.planDescription,
     security: value.securityDescription({ host: portal.host }),
     sessions: value.sessionsDescription,
@@ -180,7 +180,6 @@ const description = computed(() => {
     reports: value.reportsDescription,
     documents: value.documentsDescription,
     people: peopleTotal.value === null ? null : value.peopleDescription(peopleTotal.value),
-    fonts: '团队共享字体：上传一次，所有成员的网页版和桌面端都能直接使用。',
     email: value.emailDeliveryDescription,
     activity: value.activityDescription
   }
@@ -234,6 +233,7 @@ onMounted(() => void refreshWaiting())
     <!-- Sections keep what they loaded while another is shown, and load again on return. -->
     <KeepAlive :max="SECTIONS_KEPT">
       <ProfileSection v-if="active === 'profile'" />
+      <FontSpaceSection v-else-if="active === 'fonts'" />
       <PlanSection v-else-if="active === 'plan'" />
       <SecuritySection v-else-if="active === 'security'" />
       <SessionsSection v-else-if="active === 'sessions'" />
@@ -253,7 +253,6 @@ onMounted(() => void refreshWaiting())
         @total="(count) => (peopleTotal = count)"
         @open="openPerson"
       />
-      <AdminFontsSection v-else-if="active === 'fonts'" />
       <AdminEmailSection v-else-if="active === 'email'" />
       <AdminActivitySection v-else />
     </KeepAlive>
