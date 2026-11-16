@@ -25,6 +25,9 @@ function authAdapter() {
     async revokeUserSessions() {
       return complete()
     },
+    async createUser() {
+      return { id: crypto.randomUUID() }
+    },
     async setRole() {
       return complete()
     },

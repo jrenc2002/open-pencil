@@ -74,6 +74,11 @@ export interface CloudAuthAdapter {
   unbanUser(headers: Headers, userId: string): Promise<void>
   revokeUserSessions(headers: Headers, userId: string): Promise<void>
   setRole(headers: Headers, userId: string, role: 'user' | 'admin'): Promise<void>
+  /** An administrator creates an email-and-password account; returns its id. */
+  createUser(
+    headers: Headers,
+    input: { email: string; name: string; password: string }
+  ): Promise<{ id: string }>
   mfaStatus(headers: Headers): Promise<CloudMFAStatus | null>
   enableTOTP(
     headers: Headers,

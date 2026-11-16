@@ -11,6 +11,7 @@ import { useDateFormat } from '@/app/i18n/date'
 import AppAlert from '@/components/ui/feedback/AppAlert.vue'
 
 import PortalPeople from '../console/PortalPeople.vue'
+import AdminAddMembers from './AdminAddMembers.vue'
 import { personAction, portalPerson } from './people'
 
 /** The accounts on this server, a page at a time, and what administrators do about them. */
@@ -37,6 +38,7 @@ const error = computed(() => action.error.value)
 
 <template>
   <div class="flex flex-col gap-3">
+    <AdminAddMembers @created="people?.reload()" />
     <AppAlert v-if="error" tone="error" :heading="messages.errorTitle" :description="error" />
     <PortalPeople
       ref="people"

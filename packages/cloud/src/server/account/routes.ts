@@ -85,7 +85,10 @@ export function createAccountRoutes(services: AccountRouteDependencies) {
         let state: CloudAccountStatus['state'] = enrollmentState ?? 'active'
         if (!enrollmentState && !(await services.terms.hasAccepted(identity.userId)))
           state = 'terms'
-        if (state === 'active') await workspaces.ensurePersonal(identity)
+        if (state === 'active') {
+          await workspaces.ensurePersonal(identity)
+          await workspaces.ensureCompanyMember(identity)
+        }
         return context.json({ user: identity, state })
       })
       .post('/api/account/terms', validatedJSON(parseCloudTermsAcceptance), async (context) => {

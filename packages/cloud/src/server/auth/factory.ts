@@ -420,6 +420,13 @@ export function createBetterAuthAdapter(
     async setRole(headers, userId, role) {
       await auth.api.setRole({ headers, body: { userId, role } })
     },
+    async createUser(headers, input) {
+      const result = await auth.api.createUser({
+        headers,
+        body: { email: input.email, name: input.name, password: input.password, role: 'user' }
+      })
+      return { id: result.user.id }
+    },
     async mfaStatus(headers) {
       const session = await auth.api.getSession({ headers, query: { disableCookieCache: true } })
       if (!session) return null

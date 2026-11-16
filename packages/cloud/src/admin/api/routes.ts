@@ -9,6 +9,7 @@ import type { AdminReportService } from '#cloud/admin/reports/service'
 import {
   enrollmentStatusSchema,
   parseDocumentTakedown,
+  parseCreateMembers,
   parseEnrollmentReview,
   parseUserMutation,
   parseUserRoleMutation
@@ -215,6 +216,14 @@ export function createCloudAdminRoutes(
         input.userId
       )
       return context.json({ ok: true as const })
+    })
+    .post('/users/create', validatedJSON(parseCreateMembers), async (context) => {
+      const members = await services.users.createMembers(
+        context.req.raw.headers,
+        context.get('actor').userId,
+        context.req.valid('json').members
+      )
+      return context.json({ members })
     })
     .post('/users/set-admin', validatedJSON(parseUserRoleMutation), async (context) => {
       const input = context.req.valid('json')

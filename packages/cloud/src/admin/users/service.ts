@@ -1,3 +1,4 @@
+import type { AdminCreatedMember } from '#cloud/contract'
 import { AdminDomainError } from '#cloud/admin/errors'
 import {
   containsPattern,
@@ -70,6 +71,17 @@ type UserRow = {
   banReason: string | null
   twoFactorEnabled: boolean | null
   createdAt: Date | string
+}
+
+const PASSWORD_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'
+
+/** Fourteen characters from an alphabet without look-alikes, with each kind at least once. */
+function generatedPassword(): string {
+  for (;;) {
+    const bytes = crypto.getRandomValues(new Uint8Array(14))
+    const password = Array.from(bytes, (byte) => PASSWORD_ALPHABET[byte % PASSWORD_ALPHABET.length]).join('')
+    if (/[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password)) return password
+  }
 }
 
 export function createAdminUserService(
@@ -281,6 +293,70 @@ export function createAdminUserService(
       await auth.revokeUserSessions(headers, userId)
       await audit(actorId, 'user.sessions-revoked', userId)
     },
+    /**
+     * 词元开物: creates accounts that can sign in at once: verified, approved, and given a random
+     * password the administrator hands over. Each joins the company workspace on first sign-in.
+     * An address that already has an account is reported, not changed.
+     */
+    async createMembers(
+      headers: Headers,
+      actorId: string,
+      members: Array<{ email: string; name?: string }>
+    ): Promise<AdminCreatedMember[]> {
+      const results: AdminCreatedMember[] = []
+      for (const member of members) {
+        const email = member.email.trim().toLowerCase()
+        const name = member.name?.trim() || email.split('@')[0] || email
+        const existing = await database
+          .selectFrom('user')
+          .select('id')
+          .where('email', '=', email)
+          .executeTakeFirst()
+        if (existing) {
+          results.push({ email, name, status: 'exists', password: null })
+          continue
+        }
+        const password = generatedPassword()
+        try {
+          const { id } = await auth.createUser(headers, { email, name, password })
+          await database.updateTable('user').set({ emailVerified: true }).where('id', '=', id).execute()
+          await database
+            .insertInto('enrollment')
+            .values({
+              id: crypto.randomUUID(),
+              emailNormalized: email,
+              name,
+              reason: 'Created by an administrator',
+              status: 'approved',
+              reviewedAt: new Date(),
+              reviewedBy: actorId,
+              reviewNote: 'Created by an administrator',
+              approvedUserId: id
+            })
+            .onConflict((conflict) =>
+              conflict.column('emailNormalized').doUpdateSet({
+                status: 'approved',
+                reviewedAt: new Date(),
+                reviewedBy: actorId,
+                approvedUserId: id
+              })
+            )
+            .execute()
+          await audit(actorId, 'user.created', id, { email })
+          results.push({ email, name, status: 'created', password })
+        } catch (error) {
+          results.push({
+            email,
+            name,
+            status: 'failed',
+            password: null,
+            error: error instanceof Error ? error.message : String(error)
+          })
+        }
+      }
+      return results
+    },
+
     async setAdmin(
       headers: Headers,
       actorId: string,

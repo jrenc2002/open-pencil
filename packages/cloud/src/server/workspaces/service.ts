@@ -32,8 +32,12 @@ function generatedSlug(name: string): string {
 
 function personalWorkspaceName(name: string): string {
   const first = name.trim().split(/\s+/)[0]
-  return first ? `${first}’s workspace` : 'Personal workspace'
+  return first ? `${first} 的个人空间` : '个人空间'
 }
+
+/** 词元开物: the workspace every approved account joins, beside its own personal one. */
+export const COMPANY_WORKSPACE_SLUG = 'company'
+export const COMPANY_WORKSPACE_NAME = '词元开物'
 
 export function createWorkspaceService(database: Kysely<CloudDatabase>) {
   return {
@@ -67,7 +71,14 @@ export function createWorkspaceService(database: Kysely<CloudDatabase>) {
      * slug is fixed per person, so concurrent calls make one workspace and later calls none.
      */
     async ensurePersonal(user: { userId: string; name: string }): Promise<void> {
-      if ((await listWorkspaces(database, user.userId)).length > 0) return
+      // By its own slug: membership of the company workspace must not stand in for it.
+      const slug = `personal-${user.userId}`
+      const existing = await database
+        .selectFrom('workspace')
+        .select('id')
+        .where('slug', '=', slug)
+        .executeTakeFirst()
+      if (existing) return
       const workspaceId = crypto.randomUUID()
       await database.transaction().execute(async (transaction) => {
         const inserted = await insertWorkspace(transaction, user.userId, {
@@ -77,6 +88,53 @@ export function createWorkspaceService(database: Kysely<CloudDatabase>) {
         })
         if (inserted) await insertWorkspaceMember(transaction, workspaceId, user.userId, 'admin')
       })
+    },
+
+    /**
+     * Puts an active account in the company workspace, creating it the first time. Its owner is
+     * the earliest deployment administrator, so the company's plan, not a member's, backs it.
+     * Deployment administrators join as workspace admins, everyone else as editors; a role an
+     * administrator changed later is kept.
+     */
+    async ensureCompanyMember(user: { userId: string }): Promise<string> {
+      let workspace = await database
+        .selectFrom('workspace')
+        .select('id')
+        .where('slug', '=', COMPANY_WORKSPACE_SLUG)
+        .executeTakeFirst()
+      if (!workspace) {
+        const owner = await database
+          .selectFrom('user')
+          .select('id')
+          .where('role', '=', 'admin')
+          .orderBy('createdAt', 'asc')
+          .executeTakeFirst()
+        await insertWorkspace(database, owner?.id ?? user.userId, {
+          id: crypto.randomUUID(),
+          name: COMPANY_WORKSPACE_NAME,
+          slug: COMPANY_WORKSPACE_SLUG
+        })
+        workspace = await database
+          .selectFrom('workspace')
+          .select('id')
+          .where('slug', '=', COMPANY_WORKSPACE_SLUG)
+          .executeTakeFirstOrThrow()
+      }
+      const account = await database
+        .selectFrom('user')
+        .select('role')
+        .where('id', '=', user.userId)
+        .executeTakeFirst()
+      await database
+        .insertInto('workspaceMember')
+        .values({
+          workspaceId: workspace.id,
+          userId: user.userId,
+          role: account?.role === 'admin' ? 'admin' : 'editor'
+        })
+        .onConflict((conflict) => conflict.columns(['workspaceId', 'userId']).doNothing())
+        .execute()
+      return workspace.id
     }
   }
 }

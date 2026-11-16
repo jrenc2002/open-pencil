@@ -122,6 +122,20 @@ export const cloudAdminUserDetailSchema = v.object({
 
 export const adminMutationResponseSchema = v.object({ ok: v.literal(true) })
 
+/** 词元开物: accounts an administrator created, each with the password to hand over. */
+export const adminCreatedMemberSchema = v.object({
+  email: v.string(),
+  name: v.string(),
+  status: v.picklist(['created', 'exists', 'failed']),
+  /** Set only for an account this request created. */
+  password: v.nullable(v.string()),
+  error: v.optional(v.string())
+})
+export const adminCreateMembersResponseSchema = v.object({
+  members: v.array(adminCreatedMemberSchema)
+})
+export type AdminCreatedMember = v.InferOutput<typeof adminCreatedMemberSchema>
+
 export const transactionalEmailAdminSchema = v.object({
   id: v.string(),
   kind: v.string(),

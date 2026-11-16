@@ -126,7 +126,8 @@ function services() {
       create: async () => {
         throw new Error('not used')
       },
-      ensurePersonal: async () => undefined
+      ensurePersonal: async () => undefined,
+      ensureCompanyMember: async () => 'company'
     },
     workspaceMembers: {
       rename: notUsed,

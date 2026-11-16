@@ -31,4 +31,18 @@ export type EnrollmentReview = v.InferOutput<typeof enrollmentReviewSchema>
 export const parseEnrollmentReview = (input: unknown) => v.parse(enrollmentReviewSchema, input)
 export const parseUserMutation = (input: unknown) => v.parse(userMutationSchema, input)
 export const parseUserRoleMutation = (input: unknown) => v.parse(userRoleMutationSchema, input)
+
+export const createMembersSchema = v.object({
+  members: v.pipe(
+    v.array(
+      v.object({
+        email: v.pipe(v.string(), v.trim(), v.toLowerCase(), v.email(), v.maxLength(254)),
+        name: v.optional(v.pipe(v.string(), v.trim(), v.maxLength(80)))
+      })
+    ),
+    v.minLength(1),
+    v.maxLength(100)
+  )
+})
+export const parseCreateMembers = (input: unknown) => v.parse(createMembersSchema, input)
 export const parseDocumentTakedown = (input: unknown) => v.parse(documentTakedownSchema, input)

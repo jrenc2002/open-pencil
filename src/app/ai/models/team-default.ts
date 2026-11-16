@@ -3,6 +3,7 @@ import { watch } from 'vue'
 import { cloudCatalogModels } from '@/app/ai/providers/openpencil/catalog'
 import { OPENPENCIL_AI_PROVIDER } from '@/app/ai/providers/openpencil/provider'
 import { cloudAIClient, cloudAIIdentity, cloudAIWorkspaces } from '@/app/cloud/integration'
+import { COMPANY_NAME } from '@/constants'
 
 import { readAIModelSettingsStorage } from './storage'
 import {
@@ -46,7 +47,9 @@ async function applyTeamDefault(): Promise<void> {
   }
   running = true
   try {
-    const workspace = (await cloudAIWorkspaces().catch(() => []))[0]
+    // The company workspace pays for team AI when the account is in it; otherwise its first one.
+    const workspaces = await cloudAIWorkspaces().catch(() => [])
+    const workspace = workspaces.find((candidate) => candidate.name === COMPANY_NAME) ?? workspaces[0]
     if (!workspace) return
     const client = cloudAIClient(workspace.id)
     const catalog = client ? await client.catalog().catch(() => null) : null

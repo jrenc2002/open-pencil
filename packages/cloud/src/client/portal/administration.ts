@@ -1,5 +1,6 @@
 import {
   adminAuditResponseSchema,
+  adminCreateMembersResponseSchema,
   adminEmailResponseSchema,
   adminMutationResponseSchema,
   adminOperationsResponseSchema,
@@ -92,6 +93,14 @@ export function createAdministrationAPI(call: CloudCall, { admin, api }: PortalR
       return call(
         (options) => admin.users[action].$post({ json: { userId, reason } }, options),
         adminMutationResponseSchema,
+        signal
+      )
+    },
+    /** 词元开物: creates verified, approved accounts and returns their passwords. */
+    createMembers(members: Array<{ email: string; name?: string }>, signal?: AbortSignal) {
+      return call(
+        (options) => admin.users.create.$post({ json: { members } }, options),
+        adminCreateMembersResponseSchema,
         signal
       )
     },
