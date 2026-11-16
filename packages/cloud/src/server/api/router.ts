@@ -25,6 +25,7 @@ import {
   createPublicDocumentRoutes,
   createPublicSharingRoutes
 } from '#cloud/server/sharing'
+import type { StorageCredentialService } from '#cloud/server/storage-credentials'
 import { workspaceParams, idParams, validatedJSON } from '#cloud/server/validation'
 import type { WorkspaceMemberService, WorkspaceService } from '#cloud/server/workspaces'
 import { createWorkspaceRoutes } from '#cloud/server/workspaces'
@@ -52,6 +53,8 @@ export type CloudAPIServices = {
   workspaceMembers: WorkspaceMemberService
   /** 词元开物: the team font library. */
   fonts?: TeamFontService
+  /** 词元开物: temporary credentials for the editors' storage workspace. */
+  storageCredentials?: StorageCredentialService | null
 }
 
 export function createPublicCloudAPIRouter(services: CloudAPIServices) {
@@ -113,6 +116,12 @@ export function createCloudAPIRouter(services: CloudAPIServices) {
       })
     })
     .get('/session', (context) => context.json({ user: context.get('actor') }))
+    .get('/storage/credentials', async (context) => {
+      if (!services.storageCredentials) {
+        return context.json({ error: { code: 'not_found' as const } }, 404)
+      }
+      return context.json(await services.storageCredentials.issue(context.get('actor')))
+    })
     .get('/fonts', async (context) => {
       if (!services.fonts) return context.json({ fonts: [] })
       return context.json({ fonts: await services.fonts.list() })

@@ -21,7 +21,6 @@ import {
   createTauriDownloadedFontCache,
   downloadedFontCacheSummary as tauriDownloadedFontCacheSummary
 } from '@/app/editor/fonts/cache'
-import { loadTeamFont, teamFontCatalog } from '@/app/editor/fonts/team'
 import { isTauri } from '@/app/tauri/env'
 import { tauriFetch } from '@/app/tauri/http'
 import { IS_TAURI } from '@/constants'
@@ -74,20 +73,35 @@ if (!isTauri()) {
   fontManager.setHostFontLoader(loadHostFont)
 }
 
-/** 词元开物: a team library face first, then the one installed on this machine. */
+type TeamFontLoader = (family: string, style: string) => Promise<ArrayBuffer | null>
+
+/** 词元开物: the company font space, registered by Cloud while someone is signed in. */
+let teamFontLoader: TeamFontLoader | null = null
+let teamFontCatalog: HostFontFamily[] = []
+
+/** A face from the company font space first, then the one installed on this machine. */
 async function loadHostFont(family: string, style = 'Regular'): Promise<ArrayBuffer | null> {
-  return (await loadTeamFont(family, style)) ?? (await loadSystemFont(family, style))
+  return (await teamFontLoader?.(family, style)) ?? (await loadSystemFont(family, style))
+}
+
+/** Cloud registers how to read company faces; null when signed out. */
+export function setTeamFontLoader(loader: TeamFontLoader | null): void {
+  teamFontLoader = loader
+  // Faces asked for before the space was listed must be read again.
+  fontManager.setHostFontLoader(loadHostFont)
+}
+
+/** Cloud registers the families of the company font space, which the font picker lists. */
+export function setTeamFontCatalog(catalog: HostFontFamily[]): void {
+  teamFontCatalog = catalog
+  fontManager.setHostFontLoader(loadHostFont)
+  publishHostCatalog()
 }
 
 /** The installed families and the team library's, as the weight list and font picker read them. */
 function publishHostCatalog(): void {
-  fontManager.setHostFontCatalog([...(tauriFontsCache ?? []), ...teamFontCatalog.value])
+  fontManager.setHostFontCatalog([...(tauriFontsCache ?? []), ...teamFontCatalog])
 }
-watch(teamFontCatalog, () => {
-  // Faces asked for before the library was listed must be read again.
-  fontManager.setHostFontLoader(loadHostFont)
-  publishHostCatalog()
-})
 
 let tauriFontsCache: HostFontFamily[] | null = null
 let tauriFontsPromise: Promise<HostFontFamily[]> | null = null
@@ -153,9 +167,9 @@ export async function listFamilies(): Promise<FontFamilyOption[]> {
 export async function listFonts(): Promise<HostFontFamily[]> {
   configureTauriFontCache()
   if (isTauri()) {
-    return [...(await getTauriFonts()), ...teamFontCatalog.value]
+    return [...(await getTauriFonts()), ...teamFontCatalog]
   }
-  return teamFontCatalog.value
+  return teamFontCatalog
 }
 
 interface FontRenderInvalidator {

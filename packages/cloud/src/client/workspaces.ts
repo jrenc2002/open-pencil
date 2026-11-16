@@ -1,5 +1,7 @@
 import {
+  storageCredentialsSchema,
   teamFontDownloadSchema,
+  type StorageCredentials,
   teamFontListSchema,
   teamFontResponseSchema,
   type TeamFont,
@@ -129,6 +131,14 @@ export function createWorkspaceRequests(
     async listTeamFonts(): Promise<TeamFont[]> {
       const response = await parseResponse(client.fonts.$get(), teamFontListSchema, onDiagnostic)
       return response.fonts
+    },
+    /** 词元开物: temporary credentials for the storage workspace in the company bucket. */
+    async storageCredentials(): Promise<StorageCredentials> {
+      return parseResponse(
+        client.storage.credentials.$get(),
+        storageCredentialsSchema,
+        onDiagnostic
+      )
     },
     /** Where to fetch a face's bytes from object storage; null when there is no such face. */
     async teamFontDownloadURL(id: string): Promise<string | null> {

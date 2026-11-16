@@ -1,4 +1,3 @@
-import { createTeamFontService } from '#cloud/server/fonts'
 import {
   createAdminAuditService,
   createAdminDocumentService,
@@ -14,7 +13,9 @@ import { createTermsService } from '#cloud/server/account/terms'
 import { createAccessTokenRoutes } from '#cloud/server/account/tokens'
 import { createCloudAPIRouter, createPublicCloudAPIRouter } from '#cloud/server/api'
 import { createAuthenticationEmailService } from '#cloud/server/auth'
+import { createTeamFontService } from '#cloud/server/fonts'
 import { createInternalRoutes, createInternalService } from '#cloud/server/internal'
+import { createStorageCredentialService } from '#cloud/server/storage-credentials'
 import { Hono } from 'hono'
 
 import type { createRequestChecks, createRequestResolvers } from './checks'
@@ -106,7 +107,8 @@ export function createAppRouters(
     rateLimitSecret: config.authSecret,
     servicesTokens: app.servicesTokens,
     billingTokens: app.billingTokens,
-    fonts
+    fonts,
+    storageCredentials: createStorageCredentialService(config)
   })
   const publicCloudAPI = createPublicCloudAPIRouter(shared)
   // Services such as billing authenticate with their own token, not a session.

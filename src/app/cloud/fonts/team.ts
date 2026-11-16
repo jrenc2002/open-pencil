@@ -3,8 +3,10 @@ import { computed, ref, watch } from 'vue'
 import type { TeamFont } from '@open-pencil/cloud/contract'
 import type { HostFontFamily } from '@open-pencil/core/text'
 
-import { homeCloudServer } from '@/app/cloud/servers/store'
-import { cloudAPIClient, cloudConnection } from '@/app/cloud/sessions/connection'
+import { setTeamFontCatalog, setTeamFontLoader } from '@/app/editor/fonts'
+
+import { homeCloudServer } from '../servers/store'
+import { cloudAPIClient, cloudConnection } from '../sessions/connection'
 
 /**
  * 词元开物: the team font library. While someone is signed in to the Home server, its fonts are
@@ -96,4 +98,10 @@ export function loadTeamFont(family: string, style: string): Promise<ArrayBuffer
     files.set(font.id, file)
   }
   return file
+}
+
+/** Registers the company font space with the editor's fonts, kept current while signed in. */
+export function installTeamFonts(): void {
+  setTeamFontLoader(loadTeamFont)
+  watch(teamFontCatalog, (catalog) => setTeamFontCatalog(catalog), { immediate: true })
 }

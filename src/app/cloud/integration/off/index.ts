@@ -19,6 +19,10 @@ export const CLOUD_INCLUDED: boolean = false
 // Still the identifier Home and Save to compare locations with; no provider registers it.
 export { CLOUD_STORAGE_PROVIDER_ID } from '@/app/cloud/sessions/token'
 
+/** 词元开物: without Cloud there is no company server to add and no team font space. */
+export const ensureCompanyCloudServer = (): Promise<void> => Promise.resolve()
+export const installTeamFonts: () => void = noop
+
 /** Nothing opens from a Cloud link without Cloud. */
 export const openingCloudLink = computed(() => false)
 

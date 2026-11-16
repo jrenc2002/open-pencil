@@ -83,6 +83,7 @@ export {
 } from './billing'
 export * from './admin'
 export * from './fonts'
+export * from './storage-credentials'
 export {
   cloudPresenceSchema,
   collaborationPrincipalSchema,

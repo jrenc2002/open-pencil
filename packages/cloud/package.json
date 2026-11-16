@@ -122,6 +122,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1149.0",
+    "@aws-sdk/client-sts": "^3.1149.0",
     "@aws-sdk/s3-request-presigner": "^3.1149.0",
     "@better-auth/api-key": "1.7.7",
     "@better-auth/core": "1.7.7",

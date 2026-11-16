@@ -16,6 +16,8 @@ export {
   type CloudAIWorkspace
 } from '../ai/access'
 export { cloudDocumentAddress } from '../documents/link'
+export { installTeamFonts } from '../fonts/team'
+export { ensureCompanyCloudServer } from '../servers/store'
 export { isCloudBinding } from '../documents/status'
 export { saveDocument } from '../drafts/save'
 export { openCloudShare } from '../sharing/dialog'

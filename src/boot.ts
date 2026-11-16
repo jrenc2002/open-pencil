@@ -8,7 +8,7 @@ import { createRetainedScopePlugin } from '@open-pencil/vue/lifecycle/retention'
 
 import './app.css'
 import { installTeamAIDefault } from '@/app/ai/models/team-default'
-import { ensureCompanyCloudServer } from '@/app/cloud/servers/store'
+import { ensureCompanyCloudServer, installTeamFonts } from '@/app/cloud/integration'
 import { recordRuntimeError } from '@/app/diagnostics'
 import { installNativeFigArchives } from '@/app/document/io/native-fig'
 import { preloadCanvasKit } from '@/app/editor/canvas/canvaskit'
@@ -32,6 +32,7 @@ import router from './router'
  */
 export async function boot(): Promise<void> {
   void ensureCompanyCloudServer()
+  installTeamFonts()
   installTeamAIDefault()
   registerInterfaceFont()
   if (IS_TAURI) {

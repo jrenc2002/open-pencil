@@ -32,7 +32,8 @@ export function createS3Client(config: S3CompatibleConfig, customFetch: typeof f
     region: resolveS3Region(config),
     credentials: {
       accessKeyId: config.accessKeyId,
-      secretAccessKey: config.secretAccessKey
+      secretAccessKey: config.secretAccessKey,
+      ...(config.sessionToken ? { sessionToken: config.sessionToken } : {})
     },
     // Path-style {endpoint}/{bucket}/{key} works with B2, MinIO, R2, rclone, and AWS.
     forcePathStyle: true,

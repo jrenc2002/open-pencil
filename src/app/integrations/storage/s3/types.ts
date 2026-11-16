@@ -1,4 +1,6 @@
 export type S3CompatibleConfig = {
+  /** Set for temporary credentials, such as those the company server issues. */
+  sessionToken?: string
   endpoint: string
   bucket: string
   accessKeyId: string
