@@ -1,8 +1,8 @@
 /** The brand every OpenPencil email shares, from the waitlist to Cloud: its colors and type. */
 
 /** The ivory app-icon tile, served as PNG because mail clients do not draw SVG. */
-export const LOGO_URL = 'https://openpencil.dev/brand/app-icon-1024.png'
-export const SITE_URL = 'https://openpencil.dev'
+export const LOGO_URL = 'https://design.ciyuankaiwu.com/download/app-icon.png'
+export const SITE_URL = 'https://design.ciyuankaiwu.com'
 
 const FONT = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
 const INK = '#171717'

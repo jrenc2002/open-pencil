@@ -47,7 +47,7 @@ const { locale, dir, t } = useEmailLocalization()
         <Text v-if="$slots.note" :style="styles.note"><slot name="note" /></Text>
       </Container>
       <Text :style="styles.footer">
-        {{ t.footer }} · <Link :href="SITE_URL" :style="styles.footerLink">openpencil.dev</Link>
+        {{ t.footer }} · <Link :href="SITE_URL" :style="styles.footerLink">design.ciyuankaiwu.com</Link>
       </Text>
     </Body>
   </HTML>

@@ -1,3 +1,4 @@
+import { COMPANY_HELP_URL, COMPANY_SUPPORT_EMAIL } from '@/constants'
 import { BROWSER_BASELINE } from './baseline'
 import { baselineBrowserFor, type SupportEnvironment } from './detect'
 
@@ -18,9 +19,9 @@ export interface SupportLink {
   readonly url: string
 }
 
-export const SYSTEM_REQUIREMENTS_URL = 'https://openpencil.dev/getting-started#system-requirements'
+export const SYSTEM_REQUIREMENTS_URL = `${COMPANY_HELP_URL}#requirements`
 export const WEBVIEW2_DOWNLOAD_URL = 'https://developer.microsoft.com/microsoft-edge/webview2/'
-const ISSUE_URL = 'https://github.com/open-pencil/open-pencil/issues/new'
+const ISSUE_URL = `mailto:${COMPANY_SUPPORT_EMAIL}`
 
 export const MINIMUM_MACOS_VERSION = 13
 export const MINIMUM_WEBKITGTK_VERSION = '2.40'
@@ -71,7 +72,7 @@ const DESKTOP_ISSUE_PLATFORMS: Partial<Record<SupportEnvironment['os'], string>>
 const SELF_HOSTED_WEB_PLATFORM = 'Web (self-hosted or other address)'
 
 function issuePlatform(env: SupportEnvironment): string {
-  if (env.host === 'browser') return 'Web (app.openpencil.dev)'
+  if (env.host === 'browser') return 'Web (design.ciyuankaiwu.com)'
   return DESKTOP_ISSUE_PLATFORMS[env.os] ?? 'Not sure'
 }
 
@@ -81,16 +82,10 @@ function issueLink(
   details: readonly string[],
   platform = issuePlatform(env)
 ): SupportLink {
-  const params = new URLSearchParams({
-    template: 'bug_report.yml',
-    title,
-    platform,
-    'affected-area': 'App UI',
-    version: typeof __OPENPENCIL_APP_VERSION__ === 'string' ? __OPENPENCIL_APP_VERSION__ : '',
-    browser: env.userAgent,
-    logs: details.join('\n')
-  })
-  return { label: 'Report a problem', url: `${ISSUE_URL}?${params.toString()}` }
+  const version = typeof __OPENPENCIL_APP_VERSION__ === 'string' ? __OPENPENCIL_APP_VERSION__ : ''
+  const body = [`Platform: ${platform}`, `Version: ${version}`, '', ...details].join('\n')
+  const query = `subject=${encodeURIComponent(`[词元开物设计] ${title}`)}&body=${encodeURIComponent(body)}`
+  return { label: 'Report a problem', url: `${ISSUE_URL}?${query}` }
 }
 
 /**

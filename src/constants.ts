@@ -77,46 +77,54 @@ export const ROOM_UNREACHABLE_MS = 20_000
 /** How often a room tab rechecks its connection while it waits for the file. */
 export const ROOM_STATUS_TICK_MS = 500
 
-export const WEB_APP_ORIGIN = 'https://app.openpencil.dev'
-/** The privacy page: every request the app makes, and every usage event and field. */
-export const PRIVACY_URL = 'https://openpencil.dev/overview/privacy'
-/** The OpenPencil Cloud section of the website, with its waitlist form. */
-export const CLOUD_WAITLIST_URL = 'https://openpencil.dev/#cloud'
 /**
- * The hosted OpenPencil Cloud server, offered first when connecting. An official deployment's own
- * editor build names that deployment, such as staging.
+ * 词元开物: every link the app shows points at the company's own server. The help page is the
+ * download page until a dedicated guide exists.
+ */
+export const COMPANY_NAME = '词元开物'
+export const COMPANY_ORIGIN = 'https://design.ciyuankaiwu.com'
+export const COMPANY_HELP_URL = `${COMPANY_ORIGIN}/download/`
+export const COMPANY_SUPPORT_EMAIL = 'design@iterx.ai'
+
+export const WEB_APP_ORIGIN = COMPANY_ORIGIN
+/** The privacy page: every request the app makes, and every usage event and field. */
+export const PRIVACY_URL = `${COMPANY_HELP_URL}#privacy`
+/** The company server: there is no waitlist, everyone signs in to it. */
+export const CLOUD_WAITLIST_URL = COMPANY_ORIGIN
+/**
+ * The company Cloud server, offered first when connecting and added on first launch. A build can
+ * still name another deployment, such as staging.
  */
 export const OFFICIAL_CLOUD_URL =
   (typeof __OPENPENCIL_OFFICIAL_CLOUD_URL__ === 'string' && __OPENPENCIL_OFFICIAL_CLOUD_URL__) ||
-  'https://cloud.openpencil.dev'
+  COMPANY_ORIGIN
 /** Whether this is the editor a Cloud server serves on its own address (`bun run build:cloud`). */
 export const IS_CLOUD_SITE =
   typeof __OPENPENCIL_CLOUD_SITE__ === 'boolean' && __OPENPENCIL_CLOUD_SITE__
 /** Where the desktop app's installers are published. */
-export const DESKTOP_DOWNLOAD_URL = 'https://github.com/open-pencil/open-pencil/releases/latest'
+export const DESKTOP_DOWNLOAD_URL = COMPANY_HELP_URL
 export const NODE_DOWNLOAD_URL = 'https://nodejs.org/en/download'
 
 /**
- * Published guides. Settings links each integration section to its guide with one "Learn more"
- * at the end of the section description; alerts link only to the fix, never to docs.
+ * Guides. Every "Learn more" opens the company help page, at the section for the topic.
  */
-const DOCS_ORIGIN = 'https://openpencil.dev'
-export const MCP_SERVER_DOCS_URL = `${DOCS_ORIGIN}/programmable/mcp-server`
-/** The guide to OpenPencil Cloud, linked from the Cloud server's own pages. */
-export const CLOUD_DOCS_URL = `${DOCS_ORIGIN}/cloud/`
-export const WEBMCP_DOCS_URL = `${MCP_SERVER_DOCS_URL}#webmcp`
-export const MCP_CONNECTIONS_DOCS_URL = `${DOCS_ORIGIN}/programmable/ai-chat#external-mcp-connections`
-/** The Help menu's links: the guides, the shortcut reference, the community, and the source. */
-export const DOCS_URL = `${DOCS_ORIGIN}/getting-started`
-export const KEYBOARD_SHORTCUTS_URL = `${DOCS_ORIGIN}/reference/keyboard-shortcuts`
-export const COMMUNITY_URL = 'https://discord.gg/4wXc9fuZfm'
-export const REPOSITORY_URL = 'https://github.com/open-pencil/open-pencil'
-export const CODING_AGENTS_GUIDE_URL = `${DOCS_ORIGIN}/programmable/coding-agents`
-export const PI_GUIDE_URL = `${CODING_AGENTS_GUIDE_URL}#pi`
+export const MCP_SERVER_DOCS_URL = `${COMPANY_HELP_URL}#ai`
+/** The guide to the company server, linked from the Cloud server's own pages. */
+export const CLOUD_DOCS_URL = COMPANY_HELP_URL
+export const WEBMCP_DOCS_URL = `${COMPANY_HELP_URL}#ai`
+export const MCP_CONNECTIONS_DOCS_URL = `${COMPANY_HELP_URL}#ai`
+/** The Help menu's links: the company guide and the shortcut reference. */
+export const DOCS_URL = COMPANY_HELP_URL
+export const KEYBOARD_SHORTCUTS_URL = `${COMPANY_HELP_URL}#shortcuts`
+/** No public community or source links in the company build; menus and footers leave them out. */
+export const COMMUNITY_URL = ''
+export const REPOSITORY_URL = ''
+export const CODING_AGENTS_GUIDE_URL = `${COMPANY_HELP_URL}#ai`
+export const PI_GUIDE_URL = `${COMPANY_HELP_URL}#ai`
 
-/** The published release page, with its full notes, for a desktop version. */
+/** The release notes for a desktop version, on the company download page. */
 export function releaseNotesURL(version: string): string {
-  return `https://github.com/open-pencil/open-pencil/releases/tag/v${version}`
+  return `${COMPANY_HELP_URL}#v${version}`
 }
 
 export function getShareURL(roomId: string): string {

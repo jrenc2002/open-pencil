@@ -9,10 +9,8 @@ import { useSiteIdentity, type SiteLinkTarget } from '@/app/cloud-portal/identit
 import PortalLanguageSelect from '@/components/cloud-portal/layout/PortalLanguageSelect.vue'
 import {
   CLOUD_DOCS_URL,
-  COMMUNITY_URL,
   DESKTOP_DOWNLOAD_URL,
-  DOCS_URL,
-  REPOSITORY_URL
+  DOCS_URL
 } from '@/constants'
 
 import SiteBrand from './SiteBrand.vue'
@@ -44,9 +42,7 @@ const columns = computed<Array<{ title: string; links: SiteLinkTarget[] }>>(() =
     title: messages.value.siteResources,
     links: [
       { label: messages.value.siteDocs, href: DOCS_URL, external: true },
-      { label: messages.value.siteCloudDocs, href: CLOUD_DOCS_URL, external: true },
-      { label: 'GitHub', href: REPOSITORY_URL, external: true },
-      { label: 'Discord', href: COMMUNITY_URL, external: true }
+      { label: messages.value.siteCloudDocs, href: CLOUD_DOCS_URL, external: true }
     ]
   },
   ...(site.legalLinks.value.length > 0

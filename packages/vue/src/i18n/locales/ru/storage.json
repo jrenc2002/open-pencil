@@ -28,6 +28,6 @@
   "waitlistRefused": "Не удалось подтвердить, что вы не бот. Попробуйте ещё раз.",
   "waitlistLimited": "Слишком много попыток. Попробуйте через минуту.",
   "waitlistFailed": "Не удалось связаться с листом ожидания. Проверьте подключение и попробуйте ещё раз.",
-  "waitlistUnavailable": "Отсюда записаться нельзя. Запишитесь на openpencil.dev.",
-  "waitlistOpenWebsite": "Записаться на openpencil.dev"
+  "waitlistUnavailable": "Отсюда записаться нельзя. Запишитесь на design.ciyuankaiwu.com.",
+  "waitlistOpenWebsite": "Записаться на design.ciyuankaiwu.com"
 }

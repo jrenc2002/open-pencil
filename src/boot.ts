@@ -7,6 +7,8 @@ import { createOpenOverlaysPlugin } from '@open-pencil/vue/lifecycle/overlays'
 import { createRetainedScopePlugin } from '@open-pencil/vue/lifecycle/retention'
 
 import './app.css'
+import { installTeamAIDefault } from '@/app/ai/models/team-default'
+import { ensureCompanyCloudServer } from '@/app/cloud/servers/store'
 import { recordRuntimeError } from '@/app/diagnostics'
 import { installNativeFigArchives } from '@/app/document/io/native-fig'
 import { preloadCanvasKit } from '@/app/editor/canvas/canvaskit'
@@ -29,6 +31,8 @@ import router from './router'
  * evaluates the app bundle and can still show the gate's guidance.
  */
 export async function boot(): Promise<void> {
+  void ensureCompanyCloudServer()
+  installTeamAIDefault()
   registerInterfaceFont()
   if (IS_TAURI) {
     installNativeFigArchives()

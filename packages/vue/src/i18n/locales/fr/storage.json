@@ -28,6 +28,6 @@
   "waitlistRefused": "Nous n’avons pas pu confirmer que vous n’êtes pas un robot. Réessayez.",
   "waitlistLimited": "Trop de tentatives. Réessayez dans une minute.",
   "waitlistFailed": "Impossible de joindre la liste d’attente. Vérifiez votre connexion et réessayez.",
-  "waitlistUnavailable": "Vous ne pouvez pas vous inscrire d’ici. Inscrivez-vous sur openpencil.dev.",
-  "waitlistOpenWebsite": "S’inscrire sur openpencil.dev"
+  "waitlistUnavailable": "Vous ne pouvez pas vous inscrire d’ici. Inscrivez-vous sur design.ciyuankaiwu.com.",
+  "waitlistOpenWebsite": "S’inscrire sur design.ciyuankaiwu.com"
 }

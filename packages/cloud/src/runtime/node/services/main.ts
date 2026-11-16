@@ -11,7 +11,7 @@ if (process.argv.includes('--help') || process.argv.includes('-h')) {
     environment:
       OPENPENCIL_SERVICES_CONFIG  the services TOML file (required)
       PORT, HOST                  where to listen (default 8788 on 0.0.0.0)
-    plus the secrets the TOML names. See https://openpencil.dev/cloud/self-hosting/
+    plus the secrets the TOML names. See /design/openpencil/README.md on the server
   `)
   process.exit(0)
 }

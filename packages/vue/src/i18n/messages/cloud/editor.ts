@@ -4,7 +4,7 @@ import { i18n } from '#vue/i18n/create'
 
 /** Copy for OpenPencil Cloud inside the editor: connecting, sharing, syncing, and Home. */
 export const cloudMessageDefaults = {
-  productName: 'OpenPencil Cloud',
+  productName: '词元开物',
   continue: 'Continue',
   tryAgain: 'Try again',
   signIn: 'Sign in',

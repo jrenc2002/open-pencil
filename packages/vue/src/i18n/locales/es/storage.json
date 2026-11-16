@@ -28,6 +28,6 @@
   "waitlistRefused": "No pudimos confirmar que no eres un bot. Inténtalo de nuevo.",
   "waitlistLimited": "Demasiados intentos. Inténtalo de nuevo en un minuto.",
   "waitlistFailed": "No se pudo contactar con la lista de espera. Comprueba tu conexión e inténtalo de nuevo.",
-  "waitlistUnavailable": "No puedes unirte desde aquí. Únete en openpencil.dev.",
-  "waitlistOpenWebsite": "Unirse en openpencil.dev"
+  "waitlistUnavailable": "No puedes unirte desde aquí. Únete en design.ciyuankaiwu.com.",
+  "waitlistOpenWebsite": "Unirse en design.ciyuankaiwu.com"
 }

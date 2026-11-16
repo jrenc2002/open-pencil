@@ -106,6 +106,17 @@ export async function addCloudServer(input: {
 }
 
 /**
+ * 词元开物: a fresh install starts with the company server on Home, so people only sign in. An app
+ * that already knows any server is left as it is.
+ */
+export async function ensureCompanyCloudServer(): Promise<void> {
+  if (state.value.servers.length > 0) return
+  await addCloudServer({ kind: 'official' }).catch((error: unknown) => {
+    console.warn('[Cloud] Could not add the company server', error)
+  })
+}
+
+/**
  * On the editor a Cloud server serves on its own address, that server, which the server's own
  * sign-in session reaches without a token. The first server goes on Home.
  */

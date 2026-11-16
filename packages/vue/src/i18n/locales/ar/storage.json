@@ -28,6 +28,6 @@
   "waitlistRefused": "تعذّر علينا التأكد من أنك لست روبوتًا. حاول مرة أخرى.",
   "waitlistLimited": "محاولات كثيرة جدًا. حاول مرة أخرى بعد دقيقة.",
   "waitlistFailed": "تعذّر الوصول إلى قائمة الانتظار. تحقق من اتصالك وحاول مرة أخرى.",
-  "waitlistUnavailable": "لا يمكنك الانضمام من هنا. انضم عبر openpencil.dev بدلًا من ذلك.",
-  "waitlistOpenWebsite": "الانضمام عبر openpencil.dev"
+  "waitlistUnavailable": "لا يمكنك الانضمام من هنا. انضم عبر design.ciyuankaiwu.com بدلًا من ذلك.",
+  "waitlistOpenWebsite": "الانضمام عبر design.ciyuankaiwu.com"
 }

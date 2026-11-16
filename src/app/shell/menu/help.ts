@@ -1,5 +1,4 @@
 import { openTourFromMenu } from '@/app/demo/document'
-import { donate } from '@/app/donation'
 import { openReportDialog, REPORTS_ENABLED } from '@/app/reports/state'
 import { APP_VERSION } from '@/app/runtime/version'
 import { openSettingsDialog } from '@/app/settings/dialog'
@@ -7,12 +6,10 @@ import { detectEnvironment } from '@/app/shell/support/gate'
 import { problemReportIssueURL, type EditorSite } from '@/app/shell/support/guidance'
 import { openExternalLink } from '@/app/shell/ui'
 import {
-  COMMUNITY_URL,
   DOCS_URL,
   IS_CLOUD_SITE,
   KEYBOARD_SHORTCUTS_URL,
   releaseNotesURL,
-  REPOSITORY_URL,
   WEB_APP_ORIGIN
 } from '@/constants'
 
@@ -50,8 +47,5 @@ export function createHelpMenuActions(): Record<string, () => void> {
     'open-tour': openTourFromMenu,
     'report-problem': reportProblem,
     diagnostics: () => openSettingsDialog('diagnostics'),
-    'help-community': () => open(COMMUNITY_URL),
-    'help-github': () => open(REPOSITORY_URL),
-    'support-openpencil': () => donate('menu')
   }
 }

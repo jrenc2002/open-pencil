@@ -9,7 +9,7 @@ import { usePortal } from '@/app/cloud-portal/context'
 import { useSiteIdentity } from '@/app/cloud-portal/identity'
 import AccountAvatar from '@/components/presence/AccountAvatar.vue'
 import { useAppButtonUI } from '@/components/ui/button/button'
-import { DESKTOP_DOWNLOAD_URL, REPOSITORY_URL } from '@/constants'
+import { DESKTOP_DOWNLOAD_URL } from '@/constants'
 
 import SiteBrand from './SiteBrand.vue'
 import SiteLink from './SiteLink.vue'
@@ -61,16 +61,6 @@ const onCommunity = computed(() => route.path.startsWith(CLOUD_COMMUNITY_PATH))
         </SiteLink>
       </nav>
       <div :class="ui.actions()">
-        <a
-          v-if="site.official"
-          :href="REPOSITORY_URL"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="GitHub"
-          :class="ui.iconLink()"
-        >
-          <icon-lucide-github class="size-4" />
-        </a>
         <RouterLink v-if="!user" :to="signInPath" :class="signInButton.base">
           {{ messages.signIn }}
         </RouterLink>

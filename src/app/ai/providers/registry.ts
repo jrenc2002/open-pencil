@@ -21,7 +21,7 @@ const MODEL_PROVIDER_ADAPTERS = {
         fetch: runtime.fetch,
         headers: {
           'X-OpenRouter-Title': 'OpenPencil',
-          'HTTP-Referer': 'https://github.com/open-pencil/open-pencil'
+          'HTTP-Referer': 'https://design.ciyuankaiwu.com'
         }
       })
       return provider(config.customModelID.trim() || config.modelID)

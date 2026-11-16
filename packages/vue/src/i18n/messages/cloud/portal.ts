@@ -7,7 +7,7 @@ import { accessTokenPortalMessageDefaults } from '#vue/i18n/messages/cloud/porta
 
 /** Copy for the pages a Cloud server shows on its own address. */
 export const cloudPortalMessageDefaults = {
-  productName: 'OpenPencil Cloud',
+  productName: '词元开物',
   help: 'Help',
   loading: 'Loading…',
   unavailableTitle: 'This server isn’t answering',

@@ -28,6 +28,6 @@
   "waitlistRefused": "ボットでないことを確認できませんでした。もう一度お試しください。",
   "waitlistLimited": "試行回数が多すぎます。1 分後にもう一度お試しください。",
   "waitlistFailed": "ウェイトリストに接続できませんでした。接続を確認して、もう一度お試しください。",
-  "waitlistUnavailable": "ここからは登録できません。openpencil.dev で登録してください。",
-  "waitlistOpenWebsite": "openpencil.dev で登録"
+  "waitlistUnavailable": "ここからは登録できません。design.ciyuankaiwu.com で登録してください。",
+  "waitlistOpenWebsite": "design.ciyuankaiwu.com で登録"
 }

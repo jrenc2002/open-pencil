@@ -7,7 +7,7 @@ export const HELP_MENU: AppMenuGroupSchema = {
   items: [
     {
       id: 'help-docs',
-      label: 'OpenPencil Documentation',
+      label: '词元开物设计帮助',
       handler: 'shell',
       palette: { keywords: ['docs', 'guide', 'manual', 'help'] }
     },
@@ -37,25 +37,5 @@ export const HELP_MENU: AppMenuGroupSchema = {
       handler: 'shell',
       palette: { keywords: ['log', 'report', 'bug', 'problem', 'troubleshoot'] }
     },
-    { type: 'separator' },
-    {
-      id: 'help-community',
-      label: 'Community on Discord',
-      handler: 'shell',
-      palette: { keywords: ['discord', 'chat', 'community', 'ask'] }
-    },
-    {
-      id: 'help-github',
-      label: 'OpenPencil on GitHub',
-      handler: 'shell',
-      palette: { keywords: ['github', 'source', 'code', 'repository'] }
-    },
-    {
-      id: 'support-openpencil',
-      feature: 'donation',
-      label: 'Support OpenPencil…',
-      handler: 'shell',
-      palette: { keywords: ['donate', 'donation', 'sponsor', 'fund', 'tip'] }
-    }
   ]
 }
