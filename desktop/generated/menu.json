@@ -714,7 +714,7 @@
     "items": [
       {
         "id": "help-docs",
-        "label": "OpenPencil Documentation"
+        "label": "词元开物设计帮助"
       },
       {
         "id": "help-shortcuts",
@@ -738,22 +738,6 @@
       {
         "id": "diagnostics",
         "label": "Diagnostics…"
-      },
-      {
-        "type": "separator"
-      },
-      {
-        "id": "help-community",
-        "label": "Community on Discord"
-      },
-      {
-        "id": "help-github",
-        "label": "OpenPencil on GitHub"
-      },
-      {
-        "id": "support-openpencil",
-        "label": "Support OpenPencil…",
-        "feature": "donation"
       }
     ]
   }

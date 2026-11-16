@@ -1,4 +1,3 @@
-import type { AdminCreatedMember } from '#cloud/contract'
 import { AdminDomainError } from '#cloud/admin/errors'
 import {
   containsPattern,
@@ -12,7 +11,8 @@ import {
   cloudAdminUserFilterSchema,
   type CloudAdminUser,
   type CloudAdminUserDetail,
-  type CloudAdminUserFilter
+  type CloudAdminUserFilter,
+  type AdminCreatedMember
 } from '#cloud/contract'
 import {
   createSignInActivity,
@@ -79,7 +79,10 @@ const PASSWORD_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456
 function generatedPassword(): string {
   for (;;) {
     const bytes = crypto.getRandomValues(new Uint8Array(14))
-    const password = Array.from(bytes, (byte) => PASSWORD_ALPHABET[byte % PASSWORD_ALPHABET.length]).join('')
+    const password = Array.from(
+      bytes,
+      (byte) => PASSWORD_ALPHABET[byte % PASSWORD_ALPHABET.length]
+    ).join('')
     if (/[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password)) return password
   }
 }
@@ -319,7 +322,11 @@ export function createAdminUserService(
         const password = generatedPassword()
         try {
           const { id } = await auth.createUser(headers, { email, name, password })
-          await database.updateTable('user').set({ emailVerified: true }).where('id', '=', id).execute()
+          await database
+            .updateTable('user')
+            .set({ emailVerified: true })
+            .where('id', '=', id)
+            .execute()
           await database
             .insertInto('enrollment')
             .values({

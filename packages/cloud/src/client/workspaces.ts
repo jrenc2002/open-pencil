@@ -128,8 +128,8 @@ export function createWorkspaceRequests(
       return response.fonts
     },
     /** A team face's bytes, or null when the server has no such face. */
-    async teamFontFile(fontId: string): Promise<ArrayBuffer | null> {
-      const response = await client.fonts[':fontId'].file.$get({ param: { fontId } })
+    async teamFontFile(id: string): Promise<ArrayBuffer | null> {
+      const response = await client.fonts[':id'].file.$get({ param: { id } })
       return response.ok ? response.arrayBuffer() : null
     },
     async getWorkspaceEntitlements(workspaceId: string): Promise<WorkspaceEntitlements> {

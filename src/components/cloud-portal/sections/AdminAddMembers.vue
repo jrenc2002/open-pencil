@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { compact } from 'es-toolkit'
 import { computed, ref } from 'vue'
 
 import type { AdminCreatedMember } from '@open-pencil/cloud/contract'
@@ -26,14 +27,10 @@ const results = ref<AdminCreatedMember[]>([])
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const parsed = computed(() =>
-  text.value
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [email = '', ...rest] = line.split(/[\s,，;；\t]+/)
-      return { email: email.toLowerCase(), name: rest.join(' ').trim() || undefined }
-    })
+  compact(text.value.split('\n').map((line) => line.trim())).map((line) => {
+    const [email = '', ...rest] = line.split(/[\s,，;；\t]+/)
+    return { email: email.toLowerCase(), name: rest.join(' ').trim() || undefined }
+  })
 )
 const invalid = computed(() => parsed.value.filter((member) => !EMAIL.test(member.email)))
 const canSubmit = computed(
@@ -103,10 +100,17 @@ async function submit() {
 
       <div v-if="results.length" class="flex flex-col gap-2">
         <div class="flex items-center justify-between">
-          <p class="text-xs text-muted">密码只在这里显示一次，请复制后交给成员。成员登录后可以自己修改。</p>
-          <AppCopyButton v-if="created.length" :value="credentials" label="复制全部账号" copied-label="已复制" />
+          <p class="text-xs text-muted">
+            密码只在这里显示一次，请复制后交给成员。成员登录后可以自己修改。
+          </p>
+          <AppCopyButton
+            v-if="created.length"
+            :value="credentials"
+            label="复制全部账号"
+            copied-label="已复制"
+          />
         </div>
-        <table class="w-full text-left text-xs">
+        <table class="w-full text-start text-xs">
           <thead class="text-muted">
             <tr>
               <th class="py-1 font-medium">邮箱</th>
@@ -117,10 +121,12 @@ async function submit() {
           </thead>
           <tbody>
             <tr v-for="member in results" :key="member.email" class="border-t border-border">
-              <td class="py-1 pr-2">{{ member.email }}</td>
-              <td class="py-1 pr-2">{{ member.name }}</td>
-              <td class="py-1 pr-2 font-mono">{{ member.password ?? '—' }}</td>
-              <td class="py-1" :title="member.error">{{ STATUS_LABELS[member.status] }}</td>
+              <td class="py-1 pe-2">{{ member.email }}</td>
+              <td class="py-1 pe-2">{{ member.name }}</td>
+              <td class="py-1 pe-2 font-mono">{{ member.password ?? '—' }}</td>
+              <td class="py-1">
+                {{ STATUS_LABELS[member.status] }}{{ member.error ? `：${member.error}` : '' }}
+              </td>
             </tr>
           </tbody>
         </table>

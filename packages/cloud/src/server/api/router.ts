@@ -1,4 +1,3 @@
-import type { TeamFontService } from '#cloud/server/fonts'
 import type { CloudAPIEnvironment } from '#cloud/server/api/types'
 import type { CloudSessionResolver } from '#cloud/server/auth'
 import { createBillingRoutes, type BillingTokenService } from '#cloud/server/billing'
@@ -15,6 +14,7 @@ import {
   createDocumentVersionRoutes,
   type DocumentVersionService
 } from '#cloud/server/documents/versions'
+import type { TeamFontService } from '#cloud/server/fonts'
 import type { EntitlementService } from '#cloud/server/policy'
 import { createPublicReportRoutes, type DocumentReportService } from '#cloud/server/reports'
 import { createServicesRoutes, type ServicesTokenService } from '#cloud/server/services'
@@ -24,7 +24,7 @@ import {
   createPublicDocumentRoutes,
   createPublicSharingRoutes
 } from '#cloud/server/sharing'
-import { workspaceParams } from '#cloud/server/validation'
+import { workspaceParams, idParams } from '#cloud/server/validation'
 import type { WorkspaceMemberService, WorkspaceService } from '#cloud/server/workspaces'
 import { createWorkspaceRoutes } from '#cloud/server/workspaces'
 import { Hono } from 'hono'
@@ -90,8 +90,8 @@ export function createCloudAPIRouter(services: CloudAPIServices) {
       if (!services.fonts) return context.json({ fonts: [] })
       return context.json({ fonts: await services.fonts.list() })
     })
-    .get('/fonts/:fontId/file', async (context) => {
-      const font = services.fonts ? await services.fonts.read(context.req.param('fontId')) : null
+    .get('/fonts/:id/file', idParams, async (context) => {
+      const font = services.fonts ? await services.fonts.read(context.req.valid('param').id) : null
       if (!font) return context.json({ error: { code: 'not_found' as const } }, 404)
       return context.body(new Uint8Array(font.bytes), 200, {
         'Content-Type': font.contentType,

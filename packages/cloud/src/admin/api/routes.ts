@@ -1,4 +1,3 @@
-import { TeamFontError, type TeamFontService } from '#cloud/server/fonts'
 import { requireTrustedMutationOrigin } from '#cloud/admin/api/security'
 import type { AdminAuditService } from '#cloud/admin/audit/service'
 import type { AdminDocumentService } from '#cloud/admin/documents/service'
@@ -26,6 +25,7 @@ import {
 import type { CloudAPIEnvironment } from '#cloud/server/api'
 import type { CloudAuthAdapter } from '#cloud/server/auth'
 import type { CloudDatabase } from '#cloud/server/db'
+import { TeamFontError, type TeamFontService } from '#cloud/server/fonts'
 import { CLOUD_RATE_LIMITS, createActorRateLimiter } from '#cloud/server/rate-limit'
 import { idParams, validatedJSON, validatedQuery } from '#cloud/server/validation'
 import { Hono, type Context } from 'hono'
@@ -81,6 +81,13 @@ export type CloudAdminServices = {
   fonts: TeamFontService
 }
 
+const TEAM_FONT_ERROR_STATUS = {
+  not_found: 404,
+  duplicate: 409,
+  too_large: 400,
+  unsupported_format: 400
+} as const
+
 export function createCloudAdminRoutes(
   services: CloudAdminServices,
   trustedOrigins: ReadonlySet<string>,
@@ -125,7 +132,7 @@ export function createCloudAdminRoutes(
         return context.json({ error: { code: error.code } }, adminErrorStatus(error))
       }
       if (error instanceof TeamFontError) {
-        const status = error.code === 'not_found' ? 404 : error.code === 'duplicate' ? 409 : 400
+        const status = TEAM_FONT_ERROR_STATUS[error.code]
         return context.json({ error: { code: error.code, message: error.message } }, status)
       }
       if (error instanceof v.ValiError) {

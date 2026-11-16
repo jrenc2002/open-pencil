@@ -1,3 +1,4 @@
+import { StorageSerializers, useLocalStorage } from '@vueuse/core'
 import { watch } from 'vue'
 
 import { cloudCatalogModels } from '@/app/ai/providers/openpencil/catalog'
@@ -20,20 +21,17 @@ import {
  */
 const APPLIED_KEY = 'openpencil:team-ai-default'
 
+const appliedAt = useLocalStorage<string | null>(APPLIED_KEY, null, {
+  serializer: StorageSerializers.string,
+  writeDefaults: false
+})
+
 function alreadyApplied(): boolean {
-  try {
-    return localStorage.getItem(APPLIED_KEY) !== null
-  } catch {
-    return true
-  }
+  return appliedAt.value !== null
 }
 
 function markApplied(): void {
-  try {
-    localStorage.setItem(APPLIED_KEY, new Date().toISOString())
-  } catch {
-    // Storage blocked: the default is applied again next time, which changes nothing new.
-  }
+  appliedAt.value = new Date().toISOString()
 }
 
 const configuredBefore = readAIModelSettingsStorage() !== null
@@ -49,7 +47,8 @@ async function applyTeamDefault(): Promise<void> {
   try {
     // The company workspace pays for team AI when the account is in it; otherwise its first one.
     const workspaces = await cloudAIWorkspaces().catch(() => [])
-    const workspace = workspaces.find((candidate) => candidate.name === COMPANY_NAME) ?? workspaces[0]
+    const workspace =
+      workspaces.find((candidate) => candidate.name === COMPANY_NAME) ?? workspaces.at(0)
     if (!workspace) return
     const client = cloudAIClient(workspace.id)
     const catalog = client ? await client.catalog().catch(() => null) : null

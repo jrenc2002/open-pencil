@@ -21,12 +21,15 @@ const input = ref<HTMLInputElement | null>(null)
 
 const families = computed(() => {
   const byFamily = new Map<string, TeamFont[]>()
-  for (const font of fonts.value) byFamily.set(font.family, [...(byFamily.get(font.family) ?? []), font])
+  for (const font of fonts.value)
+    byFamily.set(font.family, [...(byFamily.get(font.family) ?? []), font])
   return [...byFamily].map(([family, faces]) => ({ family, faces }))
 })
 
 function size(bytes: number): string {
-  return bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.ceil(bytes / 1024)} KB`
+  return bytes >= 1024 * 1024
+    ? `${(bytes / 1024 / 1024).toFixed(1)} MB`
+    : `${Math.ceil(bytes / 1024)} KB`
 }
 
 function message(cause: unknown): string {
@@ -67,7 +70,11 @@ async function upload(files: FileList | null) {
 }
 
 async function remove(font: TeamFont) {
-  if (busy.value || !confirm(`从字体库删除「${font.family} ${font.style}」？用到它的稿件会改用替代字体显示。`)) return
+  if (
+    busy.value ||
+    !confirm(`从字体库删除「${font.family} ${font.style}」？用到它的稿件会改用替代字体显示。`)
+  )
+    return
   busy.value = true
   error.value = null
   try {
@@ -88,7 +95,8 @@ onMounted(load)
     <section class="flex flex-col gap-2 rounded-lg border border-border p-4">
       <div class="flex items-center justify-between gap-3">
         <p class="text-xs text-muted">
-          支持 TTF、OTF、WOFF、WOFF2，单个文件最大 30 MB。文件名按「字体名-字重.ttf」命名可自动识别，例如
+          支持 TTF、OTF、WOFF、WOFF2，单个文件最大 30
+          MB。文件名按「字体名-字重.ttf」命名可自动识别，例如
           <code>SourceHanSans-Bold.otf</code>、<code>Inter-SemiBoldItalic.ttf</code>。
         </p>
         <AppButton variant="solid" size="sm" :disabled="busy" @click="input?.click()">
@@ -108,7 +116,9 @@ onMounted(load)
     </section>
 
     <p v-if="loading" class="text-xs text-muted">正在读取字体库…</p>
-    <p v-else-if="!families.length" class="text-xs text-muted">字体库还是空的，先上传一些公司常用字体吧。</p>
+    <p v-else-if="!families.length" class="text-xs text-muted">
+      字体库还是空的，先上传一些公司常用字体吧。
+    </p>
     <section
       v-for="group in families"
       :key="group.family"
@@ -123,7 +133,9 @@ onMounted(load)
         <span>{{ font.style }} · {{ font.weight }}{{ font.italic ? ' 斜体' : '' }}</span>
         <span class="flex items-center gap-3 text-muted">
           {{ size(font.byteLength) }}
-          <AppButton variant="ghost" size="xs" :disabled="busy" @click="remove(font)">删除</AppButton>
+          <AppButton variant="ghost" size="xs" :disabled="busy" @click="remove(font)"
+            >删除</AppButton
+          >
         </span>
       </div>
     </section>

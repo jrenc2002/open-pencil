@@ -1,10 +1,9 @@
-import { sha256 } from '@noble/hashes/sha2.js'
-import { fromUint8Array } from 'js-base64'
-import type { Kysely } from 'kysely'
-
 import type { TeamFont } from '#cloud/contract'
 import type { CloudDatabase } from '#cloud/server/db'
 import type { ObjectStore } from '#cloud/server/objects'
+import { sha256 } from '@noble/hashes/sha2.js'
+import { fromUint8Array } from 'js-base64'
+import type { Kysely } from 'kysely'
 
 /** The largest font file the library takes. */
 export const TEAM_FONT_MAX_BYTES = 30 * 1024 * 1024
@@ -53,7 +52,7 @@ export function styleFace(style: string): { weight: number; italic: boolean } {
  */
 export function guessFromFileName(fileName: string): { family: string; style: string } {
   const base = fileName.replace(/\.[^.]+$/, '').trim()
-  const [family = base, style = 'Regular'] = base.includes('-')
+  const [family, style] = base.includes('-')
     ? [base.slice(0, base.lastIndexOf('-')), base.slice(base.lastIndexOf('-') + 1)]
     : [base, 'Regular']
   const spaced = style.replace(/([a-z])([A-Z])/g, '$1 $2').trim() || 'Regular'

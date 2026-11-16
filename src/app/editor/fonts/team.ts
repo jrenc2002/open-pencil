@@ -20,6 +20,10 @@ const home = computed(() => {
   return { server, discovery: connection.discovery, key: `${server.id}:${connection.account.id}` }
 })
 
+function currentKey(): string | null {
+  return home.value?.key ?? null
+}
+
 const files = new Map<string, Promise<ArrayBuffer | null>>()
 let listed: string | null = null
 
@@ -33,7 +37,8 @@ async function refresh(): Promise<void> {
   const key = current.key
   try {
     const fonts = await cloudAPIClient(current.server, current.discovery).listTeamFonts()
-    if (home.value?.key !== key) return
+    // Signed out or switched accounts while the list loaded: that answer is for no one now.
+    if (currentKey() !== key) return
     teamFonts.value = fonts
     listed = key
   } catch (error) {
@@ -49,11 +54,6 @@ watch(
   },
   { immediate: true }
 )
-
-/** Lists the library again, after an administrator added or removed fonts. */
-export function refreshTeamFonts(): Promise<void> {
-  return refresh()
-}
 
 /** The library's families with their faces, in the form the font manager lists hosts' fonts. */
 export const teamFontCatalog = computed<HostFontFamily[]>(() => {
