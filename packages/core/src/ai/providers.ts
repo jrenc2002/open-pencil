@@ -119,6 +119,7 @@ export type AIProviderID =
   | 'chatgpt'
   | 'google'
   | 'deepseek'
+  | 'qianfan'
   | 'openai-compatible'
   | 'zai'
   | 'minimax'
@@ -365,6 +366,22 @@ export const AI_PROVIDERS: AIProviderDef[] = [
     ]
   },
   {
+    // 词元开物: Baidu Qianfan's OpenAI-compatible API, for people bringing their own Qianfan key.
+    id: 'qianfan',
+    name: '百度千帆（DeepSeek）',
+    keyPlaceholder: 'bce-v3/ALTAK-…',
+    keyURL: 'https://console.bce.baidu.com/qianfan/ais/console/apiKey',
+    defaultModel: 'deepseek-v4.1-flash-1017',
+    models: [
+      {
+        id: 'deepseek-v4.1-flash-1017',
+        name: 'DeepSeek V4.1 Flash',
+        tag: 'Fast',
+        capabilities: ['tools']
+      }
+    ]
+  },
+  {
     id: 'zai',
     name: 'Z.ai',
     keyPlaceholder: 'API key',
@@ -433,7 +450,7 @@ export const AI_PROVIDERS: AIProviderDef[] = [
   },
   {
     id: 'openpencil',
-    name: 'OpenPencil Cloud',
+    name: '词元开物（百度千帆 DeepSeek）',
     keyPlaceholder: '',
     keyURL: '',
     defaultModel: '',

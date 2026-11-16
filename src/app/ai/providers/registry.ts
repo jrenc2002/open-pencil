@@ -43,6 +43,10 @@ const MODEL_PROVIDER_ADAPTERS = {
     }
   },
   zai: createAnthropicCompatibleAdapter({ baseURL: 'https://api.z.ai/api/anthropic' }),
+  qianfan: createOpenAICompatibleAdapter({
+    baseURL: 'https://qianfan.baidubce.com/v2',
+    mode: 'chat'
+  }),
   minimax: createOpenAICompatibleAdapter({ baseURL: 'https://api.minimax.io/v1', mode: 'chat' }),
   'openai-compatible': createOpenAICompatibleAdapter({
     baseURL: (config) => config.customBaseURL,

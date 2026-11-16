@@ -15,9 +15,10 @@ import {
 } from './store'
 
 /**
- * Team default: once someone signs in to the Home server and it offers AI, a device that has never
- * saved model settings of its own gets the server's default model for the Design, Review and Fast
- * roles. Each device does this once; later choices, such as Claude Code or Codex, stay as they are.
+ * Team default: once someone signs in to the Home server and it offers AI, every device lists the
+ * server's default model (Baidu Qianfan DeepSeek through the company server, no key to type). A
+ * device that never saved model settings of its own also uses it for the Design, Review and Fast
+ * roles, once; later choices, such as Claude Code or Codex, stay as they are.
  */
 const APPLIED_KEY = 'openpencil:team-ai-default'
 
@@ -38,11 +39,7 @@ const configuredBefore = readAIModelSettingsStorage() !== null
 let running = false
 
 async function applyTeamDefault(): Promise<void> {
-  if (running || alreadyApplied()) return
-  if (configuredBefore) {
-    markApplied()
-    return
-  }
+  if (running) return
   running = true
   try {
     // The company workspace pays for team AI when the account is in it; otherwise its first one.
@@ -52,7 +49,7 @@ async function applyTeamDefault(): Promise<void> {
     if (!workspace) return
     const client = cloudAIClient(workspace.id)
     const catalog = client ? await client.catalog().catch(() => null) : null
-    if (!catalog || readAIModelSettingsStorage() !== null || alreadyApplied()) return
+    if (!catalog) return
     const model = cloudCatalogModels(catalog).find((option) => option.id === catalog.defaultModelID)
     if (!model) return
     const existing = aiModelSettings.value.models.find((profile) => {
@@ -77,9 +74,13 @@ async function applyTeamDefault(): Promise<void> {
         cloudWorkspaceId: workspace.id,
         capabilities
       })
-    setModelRoleAssignment('design', profile.id)
-    setModelRoleAssignment('review', 'design')
-    setModelRoleAssignment('fast', 'design')
+    // Every device gets the team model; only one that never chose its own models also uses it
+    // for the Design, Review and Fast roles. Choices made later are left alone.
+    if (!configuredBefore && !alreadyApplied()) {
+      setModelRoleAssignment('design', profile.id)
+      setModelRoleAssignment('review', 'design')
+      setModelRoleAssignment('fast', 'design')
+    }
     markApplied()
   } finally {
     running = false
